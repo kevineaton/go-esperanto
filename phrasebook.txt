@@ -1,0 +1,9 @@
+Saluton|Hello
+Dankon|Thank you
+Bonvenon|Welcome
+Bonan matenon|Good morning
+Bonan vesperon|Good evening
+Bonan nokton|Good night
+Gxis la revido|Goodbye
+viro|man
+virino|woman
