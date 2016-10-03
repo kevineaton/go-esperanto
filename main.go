@@ -77,7 +77,7 @@ func loadConfig() Config {
 //loadPhrasebook will load up the phrasebook.txt file, which is a | separated file with an Esperanto
 //phrase and English translation on each line
 func loadPhrasebook() []Pair {
-    phrases := make([]Pair, 0)
+	phrases := make([]Pair, 0)
 	content, err := ioutil.ReadFile("./phrasebook.txt")
 	if err != nil {
 		panic("Cannot load phrasebook! Abandoning...")
@@ -88,23 +88,23 @@ func loadPhrasebook() []Pair {
 		p := Pair{components[0], components[1]}
 		phrases = append(phrases, p)
 	}
-    return phrases
+	return phrases
 }
 
 //CheckAuthentication will check the user's authentication token in either the
 //post body or the query string (in that priority order)
 func checkAuthentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
-        if config.AuthenticationToken == "" {
-            //somehow it wasn't setup (most likely in testing) so set it up
-            config = loadConfig()
-        }
+		if config.AuthenticationToken == "" {
+			//somehow it wasn't setup (most likely in testing) so set it up
+			config = loadConfig()
+		}
 		passedAuth := c.DefaultPostForm("auth", "")
 		if passedAuth == "" {
 			passedAuth = c.DefaultQuery("auth", "")
 		}
-        
-        if passedAuth == config.AuthenticationToken {
+
+		if passedAuth == config.AuthenticationToken {
 			c.Set("Authenticated", true)
 		} else {
 			c.Set("Authenticated", false)
@@ -145,7 +145,7 @@ func SaveNewPair(c *gin.Context, phrases []Pair) {
 				c.JSON(500, gin.H{"status": "There was a problem saving that pair"})
 				panic(err)
 			}
-            _ = append(phrases, pair)
+			_ = append(phrases, pair)
 			c.JSON(200, pair)
 		}
 	}
