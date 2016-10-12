@@ -39,7 +39,11 @@ func main() {
 
 	//setup the routes
 	router := gin.Default()
+
 	router.GET("/", func(c *gin.Context) {
+		GetAllWords(c, phrases)
+	})
+	router.GET("/random", func(c *gin.Context) {
 		GetRandomPair(c, phrases)
 	})
 	router.POST("/", checkAuthentication(), func(c *gin.Context) {
@@ -120,6 +124,11 @@ func GetRandomPair(c *gin.Context, phrases []Pair) {
 	r := rand.Intn(len(phrases))
 	p := phrases[r]
 	c.JSON(200, p)
+}
+
+//GetAllWords will get all of the words in the data set
+func GetAllWords(c *gin.Context, phrases []Pair) {
+	c.JSON(200, phrases)
 }
 
 //SaveNewPair will save a new pair of Esperanto to English definitions to the data store
