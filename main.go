@@ -26,6 +26,7 @@ var phrases []Pair
 type Config struct {
 	AuthenticationToken string
 	Port                string
+	PhraseBookLocation  string
 }
 
 //A global Config struct for use in bootstrapping and authenticating
@@ -34,8 +35,8 @@ var config Config
 //main begins the program
 func main() {
 	fmt.Println("Started, configuring phrasebook and authentication")
-	phrases = loadPhrasebook()
 	config = loadConfig()
+	phrases = loadPhrasebook()
 
 	//setup the routes
 	router := gin.Default()
@@ -58,6 +59,7 @@ func loadConfig() Config {
 	config := Config{}
 	config.AuthenticationToken = os.Getenv("GO_EO_AUTHTOKEN")
 	config.Port = os.Getenv("GO_EO_API_PORT")
+	config.PhraseBookLocation = os.Getenv("GO_EO_PHRASEBOOK_DIR")
 
 	if config.AuthenticationToken == "" {
 		//randomize it with bcrypt on each server start up and prompt the user to specify one
@@ -73,6 +75,11 @@ func loadConfig() Config {
 	if config.Port == "" {
 		config.Port = "8081"
 	}
+
+	if config.PhraseBookLocation == "" {
+		config.PhraseBookLocation = "./"
+	}
+
 	config.Port = fmt.Sprintf(":%s", config.Port)
 
 	return config
@@ -82,7 +89,9 @@ func loadConfig() Config {
 //phrase and English translation on each line
 func loadPhrasebook() []Pair {
 	phrases := make([]Pair, 0)
-	content, err := ioutil.ReadFile("./phrasebook.txt")
+	pbFile := config.PhraseBookLocation + "phrasebook.txt"
+
+	content, err := ioutil.ReadFile(pbFile)
 	if err != nil {
 		panic("Cannot load phrasebook! Abandoning...")
 	}
@@ -142,7 +151,8 @@ func SaveNewPair(c *gin.Context, phrases []Pair) {
 			c.JSON(400, gin.H{"status": "You must pass in both an 'esperanto' phrase and an 'english' phrase"})
 		} else {
 			pair := Pair{eo, en}
-			file, err := os.OpenFile("./phrasebook.txt", os.O_APPEND|os.O_WRONLY, 0600)
+			pbFile := config.PhraseBookLocation + "phrasebook.txt"
+			file, err := os.OpenFile(pbFile, os.O_APPEND|os.O_WRONLY, 0600)
 			if err != nil {
 				c.JSON(500, gin.H{"status": "There was a problem saving that pair"})
 				panic(err)

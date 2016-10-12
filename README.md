@@ -9,6 +9,7 @@ The following environment variables can be set:
 post body or the query string. If not specified, a random MD5 token will be generated on each startup
 - GO_EO_API_PORT - The port to listen on, defaults to 8081
 - GIN_MODE=release - Sets API into release mode (uses Gin for API layer)
+- GO_EO_PHRASEBOOK_DIR - The directory to find the phrasebook, (differs between development and docker)
 
 Currently, only supports flat file storage; eventually will expand to other storage mechanisms
 
