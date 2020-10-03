@@ -1,23 +1,22 @@
 package main
 
 import (
+	"net/http"
 	"testing"
 
-	"net/http"
-	"net/http/httptest"
-
-	"github.com/gin-gonic/gin"
+	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Config(t *testing.T) {
-	config := loadConfig()
+func TestConfig(t *testing.T) {
+	loadConfig()
 	//test defaults
 	assert.Equal(t, config.Port, ":8081")
 	assert.NotEqual(t, config.AuthenticationToken, "")
 }
 
-func Test_LoadPhrases(t *testing.T) {
+func TestLoadPhrases(t *testing.T) {
+	loadConfig()
 	phrases := loadPhrasebook()
 	assert.True(t, len(phrases) > 0)
 	pair := phrases[0]
@@ -25,46 +24,43 @@ func Test_LoadPhrases(t *testing.T) {
 	assert.NotEqual(t, pair.Esperanto, "")
 }
 
-func Test_GetPair(t *testing.T) {
-	phrases := loadPhrasebook()
-	c, w, _ := gin.CreateTestContext()
-	GetRandomPair(c, phrases)
-	assert.Equal(t, w.Code, 200)
-	assert.NotEqual(t, w.Body.String(), "")
-	assert.Equal(t, w.HeaderMap.Get("Content-Type"), "application/json; charset=utf-8")
+func TestGetAllPhrasesRoute(t *testing.T) {
+	loadConfig()
+	code, body, _ := TestEndpoint(http.MethodGet, "/", nil, GetAllPhrasesRoute, true)
+	assert.Equal(t, http.StatusOK, code)
+	data, err := unmarshalSliceFromTestRoute(body)
+	assert.Nil(t, err)
+	assert.NotZero(t, len(data))
+
+	// try a bad result
+	code, _, _ = TestEndpoint(http.MethodGet, "/", nil, GetAllPhrasesRoute, false)
+	assert.Equal(t, http.StatusForbidden, code)
 }
 
-func Test_GetAll(t *testing.T) {
-	phrases := loadPhrasebook()
-	c, w, _ := gin.CreateTestContext()
-	GetAllWords(c, phrases)
-	assert.Equal(t, w.Code, 200)
-	assert.NotEqual(t, w.Body.String(), "")
-	assert.Equal(t, w.HeaderMap.Get("Content-Type"), "application/json; charset=utf-8")
-}
+func TestGetRandomPhraseRoute(t *testing.T) {
+	loadConfig()
+	code, body, _ := TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
+	assert.Equal(t, http.StatusOK, code)
+	data, err := unmarshalMapFromTestRoute(body)
+	assert.Nil(t, err)
+	p1 := &Pair{}
+	err = mapstructure.Decode(data, &p1)
+	assert.Nil(t, err)
+	assert.NotEqual(t, "", p1.English)
+	assert.NotEqual(t, "", p1.Esperanto)
 
-func Test_Post_Not_Authorized(t *testing.T) {
-	c, w, _ := gin.CreateTestContext()
-	c.Set("Authenticated", false)
-	phrases := loadPhrasebook()
-	SaveNewPair(c, phrases)
-	assert.Equal(t, w.Code, 401)
-	assert.NotEqual(t, w.Body.String(), "")
-	assert.Equal(t, w.HeaderMap.Get("Content-Type"), "application/json; charset=utf-8")
-}
+	// get another one, make sure it's not the same one
+	code, body, _ = TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
+	assert.Equal(t, http.StatusOK, code)
+	data, err = unmarshalMapFromTestRoute(body)
+	assert.Nil(t, err)
+	p2 := &Pair{}
+	err = mapstructure.Decode(data, &p2)
+	assert.Nil(t, err)
+	assert.NotEqual(t, "", p2.English)
+	assert.NotEqual(t, "", p2.Esperanto)
 
-func Test_Middleware_Fail(t *testing.T) {
-	router := gin.New()
-	router.Use(checkAuthentication())
-	router.POST("/", func(c *gin.Context) {
-		assert.False(t, c.MustGet("Authenticated").(bool))
-	})
-	_ = performRequest(router, "POST", "/")
-}
-
-func performRequest(r http.Handler, method, path string) *httptest.ResponseRecorder {
-	req, _ := http.NewRequest(method, path, nil)
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	return w
+	// try without auth
+	code, _, _ = TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, false)
+	assert.Equal(t, http.StatusForbidden, code)
 }
