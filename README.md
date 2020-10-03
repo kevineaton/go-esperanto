@@ -46,4 +46,3 @@ curl http://localhost:8081/random
 ## Todo
 
 - Add other data storage
-- Minify docker image
