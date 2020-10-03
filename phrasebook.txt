@@ -63470,8 +63470,4 @@ zumo|buzz, hum, roar (traffic)
 zumrisortoj|snares
 zumrulado|buzz roll
 Zuriko|Zurich
-α-aminoglutarata acido|alpha-aminoglutaric acid
-α-helico|alpha helix
-α-radioj|alpha rays
-β-radioj|beta rays
-γ-radioj|gamma rays
+mia amiko|my friend
