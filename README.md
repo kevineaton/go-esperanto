@@ -2,6 +2,8 @@
 
 A short program with RESTful API to randomly give an Esperanto word and translation. Mostly a proof of concept and a toy.
 
+Esperanto is the world's most widely spoken constructed international auxiliary language intended to be a universal second language for international communication.
+
 Phrasebook converted from Paul Denisowski's ESPDIC Project at <http://www.denisowski.org/Esperanto/ESPDIC/espdic.txt>
 
 ## Versioning
@@ -26,19 +28,26 @@ post body or the query string. If not specified, a random MD5 token will be gene
 Currently, only supports flat file storage; eventually may expand to other storage mechanisms.
 
 ## Running
+Setup:
 
-`go build -mod=vendor .`
+`make`
 
-`GO_EO_API_PORT=8081 GO_EO_AUTHTOKEN=randomtokenforapi ./go-esperanto`
-
+or
 ```bash
-curl http://localhost:8081/
+go build -mod=vendor .
+GO_EO_API_PORT=8081 GO_EO_AUTHTOKEN=randomtokenforapi ./go-esperanto
+```
+
+Get entire dictionary:
+```bash
+curl -H "X-API-TOKEN:randomtokenforapi" http://localhost:8081/
 
 [{"esperanto":"Gxis la revido","english":"Goodbye"}, ....]
 ```
 
+Get random phrase:
 ```bash
-curl http://localhost:8081/random
+curl -H "X-API-TOKEN:randomtokenforapi" http://localhost:8081/random
 
 {"esperanto":"Gxis la revido","english":"Goodbye"}
 ```
