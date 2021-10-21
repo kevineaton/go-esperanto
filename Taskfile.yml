@@ -1,0 +1,16 @@
+version: '3'
+
+tasks:
+
+  build:
+    cmds:
+      - go build .
+  
+  run:
+    deps: [build]
+    cmds:
+      - ./go-esperanto
+  
+  test:
+    cmds:
+      - go test
