@@ -28,17 +28,36 @@ post body or the query string. If not specified, a random MD5 token will be gene
 Currently, only supports flat file storage; eventually may expand to other storage mechanisms.
 
 ## Running
+
+We have several different options for setting up and running the repo. We offer a [Task](https://taskfile.dev/) file and a Make file. Task is a cross-platform task runner. Make is often already available in some systems, so may be easier.
+
+### Task
+
+Setup:
+
+`task build` - build the repo
+
+`task test` - run the tests
+
+`task run` - build and run the app
+
+### Make
+
 Setup:
 
 `make`
 
 or
+
 ```bash
 go build -mod=vendor .
 GO_EO_API_PORT=8081 GO_EO_AUTHTOKEN=randomtokenforapi ./go-esperanto
 ```
 
+## Usage
+
 Get entire dictionary:
+
 ```bash
 curl -H "X-API-TOKEN:randomtokenforapi" http://localhost:8081/
 
@@ -46,6 +65,7 @@ curl -H "X-API-TOKEN:randomtokenforapi" http://localhost:8081/
 ```
 
 Get random phrase:
+
 ```bash
 curl -H "X-API-TOKEN:randomtokenforapi" http://localhost:8081/random
 
