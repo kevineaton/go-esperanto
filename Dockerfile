@@ -1,12 +1,12 @@
-FROM golang:1.15 AS base
+FROM golang:1.20 AS base
 
 ENV GOFLAGS -mod=vendor
 
 # Please see the readme at github.com/kevineaton/go-esperanto
 
 ADD . /go/src/github.com/kevineaton/go-esperanto
-ADD ./phrasebook.txt /go/src/github.com/kevineaton/go-esperanto
-ADD ./phrasebook.json /go/src/github.com/kevineaton/go-esperanto
+ADD ./api/phrasebook.txt /go/src/github.com/kevineaton/go-esperanto
+ADD ./api/phrasebook.json /go/src/github.com/kevineaton/go-esperanto
 WORKDIR /go/src/github.com/kevineaton/go-esperanto
 
 RUN go build -mod=vendor .

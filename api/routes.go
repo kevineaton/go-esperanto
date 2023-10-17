@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -25,7 +25,7 @@ func GetRandomPhraseRoute(w http.ResponseWriter, r *http.Request) {
 		sendError(w, http.StatusForbidden, "bad token or no token found; ensure it is passed in the X-API-TOKEN header")
 		return
 	}
-    // use a seed to get better random number
+	// use a seed to get better random number
 	rand.Seed(time.Now().UnixNano())
 	randID := rand.Intn(len(phrases))
 	p := phrases[randID]

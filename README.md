@@ -16,7 +16,7 @@ Currently at v2 of the module which has several breaking changes:
 
 ## Configuration
 
-A phrasebook is included. If you want to use a different on, you will need to replace the contents in a similarly names file.
+A phrasebook is included. If you want to use a different one, you will need to replace the contents in a similarly names file.
 
 The following environment variables can be set:
 

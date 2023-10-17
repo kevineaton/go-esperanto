@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"bytes"
@@ -19,7 +19,7 @@ func TestEndpoint(method string, endpoint string, data io.Reader, handler http.H
 	req.Header.Add("Content-Type", "application/json; charset=utf-8")
 	rr := httptest.NewRecorder()
 
-	chi := setupRouter()
+	chi := SetupRouter()
 	if valid {
 		c := context.WithValue(req.Context(), appContextAuthenticationFound, valid)
 		req.Header.Add("X-API-TOKEN", config.AuthenticationToken)
