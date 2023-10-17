@@ -1,10 +1,9 @@
-package main
+package api
 
 import (
 	"context"
 	"crypto/md5"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"os"
@@ -17,14 +16,14 @@ import (
 	"github.com/goware/cors"
 )
 
-//The Config struct holds general configuration options for the application
+// The Config struct holds general configuration options for the application
 type Config struct {
 	AuthenticationToken string
 	Port                string
 	PhraseBookLocation  string
 }
 
-//A global Config struct for use in bootstrapping and authenticating
+// A global Config struct for use in bootstrapping and authenticating
 var config *Config
 
 // A context key for auth
@@ -32,15 +31,15 @@ type key string
 
 const appContextAuthenticationFound key = "key"
 
-//loadConfig will load up a new configuration struct with sane defaults if none provided
-func loadConfig() *Config {
+// LoadConfig will load up a new configuration struct with sane defaults if none provided
+func LoadConfig() *Config {
 	if config != nil {
 		return config
 	}
 	config = &Config{}
-	config.AuthenticationToken = os.Getenv("GO_EO_AUTHTOKEN")
-	config.Port = os.Getenv("GO_EO_API_PORT")
-	config.PhraseBookLocation = os.Getenv("GO_EO_PHRASEBOOK_DIR")
+	config.AuthenticationToken = envHelper("GO_EO_AUTHTOKEN", "")
+	config.Port = envHelper("GO_EO_API_PORT", "8081")
+	config.PhraseBookLocation = envHelper("GO_EO_PHRASEBOOK_DIR", "./api/")
 
 	if config.AuthenticationToken == "" {
 		//randomize it with bcrypt on each server start up and prompt the user to specify one
@@ -60,25 +59,23 @@ func loadConfig() *Config {
 		fmt.Printf("===================================================================\n")
 	}
 
-	if config.Port == "" {
-		config.Port = "8081"
-	}
-
-	if config.PhraseBookLocation == "" {
-		config.PhraseBookLocation = "./"
-	}
-
 	config.Port = fmt.Sprintf(":%s", config.Port)
+
+	// ensure a trailing slash on the path
+	if !strings.HasSuffix(config.PhraseBookLocation, "/") {
+		config.PhraseBookLocation = config.PhraseBookLocation + "/"
+	}
 
 	// load the phrase book
 	if len(phrases) == 0 {
-		loadPhrasebook()
+		LoadPhrasebook()
 	}
 
 	return config
 }
 
-func setupRouter() *chi.Mux {
+// SetupRouter sets up and returns a new chi router
+func SetupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
 	// TODO: add rate limiter
@@ -110,32 +107,7 @@ func setupRouter() *chi.Mux {
 	return r
 }
 
-//loadPhrasebook will load up the phrasebook.txt file, which is a | separated file with an Esperanto
-//phrase and English translation on each line
-func loadPhrasebook() []Pair {
-	parsedPhrases := []Pair{}
-	pbFile := config.PhraseBookLocation + "phrasebook.txt"
-
-	content, err := ioutil.ReadFile(pbFile)
-	if err != nil {
-		panic("Cannot load phrasebook! Abandoning...")
-	}
-	lines := strings.Split(string(content), "\n")
-	for _, line := range lines {
-		if line == "" {
-			continue
-		}
-		components := strings.Split(string(line), "|")
-		if len(components) != 2 {
-			continue
-		}
-		p := Pair{components[0], components[1]}
-		parsedPhrases = append(parsedPhrases, p)
-	}
-	phrases = parsedPhrases
-	return parsedPhrases
-}
-
+// checkTokenMiddleware is a helper to check for the API token in the HTTP headers
 func checkTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authenticated := false
@@ -151,7 +123,17 @@ func checkTokenMiddleware(next http.Handler) http.Handler {
 	})
 }
 
+// checkAuthenticatedHelper is a helper to check the authentication context
 func checkAuthenticatedHelper(w *http.ResponseWriter, r *http.Request) (valid bool) {
 	valid = r.Context().Value(appContextAuthenticationFound).(bool)
 	return
+}
+
+// envHelper is a helper for getting environment variables
+func envHelper(key, defaultMissing string) string {
+	val := os.Getenv(key)
+	if val == "" {
+		val = defaultMissing
+	}
+	return val
 }

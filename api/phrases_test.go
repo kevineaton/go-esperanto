@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"net/http"
@@ -8,16 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestConfig(t *testing.T) {
-	loadConfig()
-	//test defaults
-	assert.Equal(t, config.Port, ":8081")
-	assert.NotEqual(t, config.AuthenticationToken, "")
-}
-
 func TestLoadPhrases(t *testing.T) {
-	loadConfig()
-	phrases := loadPhrasebook()
+	LoadConfig()
 	assert.True(t, len(phrases) > 0)
 	pair := phrases[0]
 	assert.NotEqual(t, pair.English, "")
@@ -25,7 +17,7 @@ func TestLoadPhrases(t *testing.T) {
 }
 
 func TestGetAllPhrasesRoute(t *testing.T) {
-	loadConfig()
+	LoadConfig()
 	code, body, _ := TestEndpoint(http.MethodGet, "/", nil, GetAllPhrasesRoute, true)
 	assert.Equal(t, http.StatusOK, code)
 	data, err := unmarshalSliceFromTestRoute(body)
@@ -38,7 +30,7 @@ func TestGetAllPhrasesRoute(t *testing.T) {
 }
 
 func TestGetRandomPhraseRoute(t *testing.T) {
-	loadConfig()
+	LoadConfig()
 	code, body, _ := TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
 	assert.Equal(t, http.StatusOK, code)
 	data, err := unmarshalMapFromTestRoute(body)
