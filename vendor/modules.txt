@@ -1,17 +1,29 @@
 # github.com/davecgh/go-spew v1.1.1
+## explicit
 github.com/davecgh/go-spew/spew
 # github.com/go-chi/chi v4.1.2+incompatible
+## explicit
 github.com/go-chi/chi
 github.com/go-chi/chi/middleware
 # github.com/go-chi/render v1.0.1
+## explicit
 github.com/go-chi/render
 # github.com/goware/cors v1.1.1
+## explicit
 github.com/goware/cors
 # github.com/mitchellh/mapstructure v1.3.3
+## explicit; go 1.14
 github.com/mitchellh/mapstructure
 # github.com/pmezard/go-difflib v1.0.0
+## explicit
 github.com/pmezard/go-difflib/difflib
 # github.com/stretchr/testify v1.6.1
+## explicit; go 1.13
 github.com/stretchr/testify/assert
+# golang.org/x/net v0.0.0-20201002202402-0a1ea396d57c
+## explicit; go 1.11
+# golang.org/x/text v0.3.2
+## explicit
 # gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+## explicit
 gopkg.in/yaml.v3
