@@ -12,8 +12,8 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
-	"github.com/goware/cors"
 )
 
 // The Config struct holds general configuration options for the application
