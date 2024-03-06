@@ -33,25 +33,18 @@ We have several different options for setting up and running the repo. We offer 
 
 ### Task
 
-Setup:
-
-`task build` - build the repo
-
-`task test` - run the tests
-
-`task run` - build and run the app
-
-### Make
-
-Setup:
-
-`make`
-
-or
+We use Task for all of our actions:
 
 ```bash
-go build -mod=vendor .
-GO_EO_API_PORT=8081 GO_EO_AUTHTOKEN=randomtokenforapi ./go-esperanto
+% task
+task: Available tasks for this project:
+* build:              Build the local Go image
+* docker-build:       Build Docker image
+* docker-push:        Pushes the Docker image
+* docker-run:         Run the Docker image; will build it
+* run:                Run the generated binary locally
+* test:               Runt the tests
+* vendor:             Updates the vendor directory
 ```
 
 ## Usage
