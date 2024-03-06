@@ -3,15 +3,18 @@ version: '3'
 tasks:
 
   build:
+    desc: Build the local Go image
     cmds:
       - go build .
   
   run:
+    desc: Run the generated binary locally
     deps: [build]
     cmds:
       - ./go-esperanto
   
   test:
+    desc: Runt the tests
     cmds:
       - go test ./...
   
@@ -20,3 +23,21 @@ tasks:
     cmds:
       - go mod tidy
       - go mod vendor
+
+  docker-build:
+    desc: Build Docker image
+    deps: [build] #make sure it builds
+    cmds:
+      - docker build -t kevineaton/go-esperanto .
+  
+  docker-run:
+    desc: Run the Docker image; will build it
+    deps: [docker-build]
+    cmds:
+      - docker run kevineaton/go-esperanto
+
+  docker-push:
+    desc: Pushes the Docker image
+    deps: [docker-build]
+    cmds:
+      - docker push kevineaton/go-esperanto
