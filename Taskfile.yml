@@ -16,7 +16,12 @@ tasks:
   test:
     desc: Runt the tests
     cmds:
-      - go test ./...
+      - go test -v ./api
+
+  cover:
+    desc: Runs coverage on the service
+    cmds:
+      - go test -v -mod=vendor ./api -coverprofile=coverage.out && go tool cover -html=coverage.out -o coverage.html
   
   vendor:
     desc: Updates the vendor directory

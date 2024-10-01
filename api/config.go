@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/render"
 )
@@ -78,8 +78,6 @@ func LoadConfig() *Config {
 func SetupRouter() *chi.Mux {
 	r := chi.NewRouter()
 
-	// TODO: add rate limiter
-
 	// setup some middlewares
 	r.Use(middleware.StripSlashes)
 	r.Use(middleware.RequestID)
@@ -112,10 +110,13 @@ func checkTokenMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authenticated := false
 		key := r.Header.Get("X-API-TOKEN")
-		// TODO: allow checking in basic auth or cookies
-
 		if key == config.AuthenticationToken {
 			authenticated = true
+		} else {
+			key = r.Header.Get("Authorization")
+			if key == fmt.Sprintf("Bearer %s", config.AuthenticationToken) {
+				authenticated = true
+			}
 		}
 
 		ctx := context.WithValue(r.Context(), appContextAuthenticationFound, authenticated)

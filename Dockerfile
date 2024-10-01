@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 golang:1.20 AS base
+FROM --platform=linux/amd64 golang:1.22 AS base
 
 ENV GOFLAGS -mod=vendor
 

@@ -1,4 +1,4 @@
-// This application runs a very basic Gin server that will randomly give an Esperanto phrase upon request or allow
+// This application runs a very basic HTTP server that will randomly give an Esperanto phrase upon request or allow
 // authenticated users to add new words to the phrase book
 package main
 
