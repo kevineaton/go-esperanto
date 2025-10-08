@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,11 +17,13 @@ func TestLoadPhrases(t *testing.T) {
 
 func TestGetAllPhrasesRoute(t *testing.T) {
 	LoadConfig()
-	code, body, _ := TestEndpoint(http.MethodGet, "/", nil, GetAllPhrasesRoute, true)
-	assert.Equal(t, http.StatusOK, code)
-	data, err := unmarshalSliceFromTestRoute(body)
+	code, body, err := TestEndpoint(http.MethodGet, "/", nil, GetAllPhrasesRoute, true)
 	assert.Nil(t, err)
-	assert.NotZero(t, len(data))
+	assert.Equal(t, http.StatusOK, code)
+	pair := []Pair{}
+	err = testEndpointResultToStruct(body, &pair)
+	assert.Nil(t, err)
+	assert.NotZero(t, len(pair))
 
 	// try a bad result
 	code, _, _ = TestEndpoint(http.MethodGet, "/", nil, GetAllPhrasesRoute, false)
@@ -31,23 +32,20 @@ func TestGetAllPhrasesRoute(t *testing.T) {
 
 func TestGetRandomPhraseRoute(t *testing.T) {
 	LoadConfig()
-	code, body, _ := TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
-	assert.Equal(t, http.StatusOK, code)
-	data, err := unmarshalMapFromTestRoute(body)
+	code, body, err := TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
 	assert.Nil(t, err)
+	assert.Equal(t, http.StatusOK, code)
 	p1 := &Pair{}
-	err = mapstructure.Decode(data, &p1)
+	err = testEndpointResultToStruct(body, &p1)
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", p1.English)
 	assert.NotEqual(t, "", p1.Esperanto)
 
 	// get another one, make sure it's not the same one
-	code, body, _ = TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
+	code, body, err = TestEndpoint(http.MethodGet, "/random", nil, GetRandomPhraseRoute, true)
 	assert.Equal(t, http.StatusOK, code)
-	data, err = unmarshalMapFromTestRoute(body)
-	assert.Nil(t, err)
 	p2 := &Pair{}
-	err = mapstructure.Decode(data, &p2)
+	err = testEndpointResultToStruct(body, &p2)
 	assert.Nil(t, err)
 	assert.NotEqual(t, "", p2.English)
 	assert.NotEqual(t, "", p2.Esperanto)

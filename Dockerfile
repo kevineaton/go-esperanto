@@ -1,6 +1,6 @@
-FROM --platform=linux/amd64 golang:1.22 AS base
+FROM golang:1.25 AS base
 
-ENV GOFLAGS -mod=vendor
+ENV GOFLAGS=-mod=vendor
 
 # Please see the readme at github.com/kevineaton/go-esperanto
 
@@ -11,7 +11,7 @@ WORKDIR /go/src/github.com/kevineaton/go-esperanto
 
 RUN go build -mod=vendor .
 
-FROM --platform=linux/amd64 busybox:glibc
+FROM busybox:glibc
 WORKDIR /go/src/github.com/kevineaton/go-esperanto
 COPY --from=base /go/src/github.com/kevineaton/go-esperanto/go-esperanto .
 COPY --from=base /go/src/github.com/kevineaton/go-esperanto/phrasebook.json .
