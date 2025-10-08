@@ -30,36 +30,16 @@ func TestEndpoint(method string, endpoint string, data io.Reader, handler http.H
 	return rr.Code, rr.Body, nil
 }
 
-// UnmarshalSliceFromTestRoute unmarshals a response that is an array in the data field
-func unmarshalSliceFromTestRoute(body *bytes.Buffer) ([]interface{}, error) {
-	response := apiReturn{}
-	ret := []interface{}{}
-	retBuf := new(bytes.Buffer)
-	retBuf.ReadFrom(body)
-	err := json.Unmarshal(retBuf.Bytes(), &response)
+func testEndpointResultToStruct(bu *bytes.Buffer, target any) error {
+	m := &apiReturn{}
+	err := json.Unmarshal(bu.Bytes(), m)
 	if err != nil {
-		return []interface{}{}, err
+		return err
 	}
-	retBody, ok := response.Data.([]interface{})
-	if ok {
-		ret = retBody
-	}
-	return ret, nil
-}
-
-func unmarshalMapFromTestRoute(body *bytes.Buffer) (map[string]interface{}, error) {
-	response := apiReturn{}
-	ret := map[string]interface{}{}
-	retBuf := new(bytes.Buffer)
-	retBuf.ReadFrom(body)
-	err := json.Unmarshal(retBuf.Bytes(), &response)
+	jsonb, err := json.Marshal(m.Data)
 	if err != nil {
-		return map[string]interface{}{}, err
+		return err
 	}
-	retBody, ok := response.Data.(map[string]interface{})
-	if ok {
-		ret = retBody
-	}
-
-	return ret, nil
+	err = json.Unmarshal(jsonb, target)
+	return err
 }
